@@ -1,0 +1,184 @@
+#!/bin/sh
+#
+# # DRSH
+#
+# I'm a long time user of [Drash](http://dra.sh/), an iPhone app that quickly
+# looks up if it's going to rain or not. I've asked @inferis about a Mac version
+# but sadly he doesn't have the time at the moment. So to scratch my own personal
+# itch, and learn more about the exciting world of shell scripting:
+#
+#       DRSH - Drash for the command line
+#
+# # What does it do?
+#
+#      drsh Achel
+#      => ▁▁▆▇▇▇██▇▆▆▇▇▆▁▁▁▆▆▁▁▁▁▁▁ (3930 Achel, Belgium)
+#
+# # How do I install it?
+#
+# `drsh` is a simple shell script, so drop it anywhere in your `$PATH` and you should
+# be ready to go. It does have two dependencies [jq](http://stedolan.github.io/jq/) and
+# [spark](https://github.com/holman/spark), but those are simple to install.
+#
+# (Homebrew has them both, so `brew install jq && brew install spark`).
+#
+# # What's missing?
+#
+# 1. At this point in time the bars don't actually reflect the amount of rain that will
+# fall, I just pass the data on to [spark](https://github.com/holman/spark) and it
+# assumes that the highest number I pass in is the maximum (but max is actually 255).
+#
+# 2. International support? But since I'm probably not going to need this, send me a
+# patch if you need it.
+#
+# 3. Less dependencies. I'll admit I mainly used `jq` to mess around with it, I'm pretty
+# sure we could ditch it and do some fancy `grep`, `awk`,`sed` and get the same results
+# without the dependency. Likewise for `spark`, it would be better to just show the chance
+# of rain if `spark` wasn't found.
+#
+# 4. More cowbell
+#
+# __Anyhoe. On to the code!__
+#
+# ## Helpers
+#
+# Helper function to determine if a function is available or not.
+drsh_cmd_available() {
+    if command -v $1 >/dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
+}
+# Checks if [jq](http://stedolan.github.io/jq/) is available, it's used to
+# parse the JSON returned from the Google API. It's good, it's small. But it is
+# a dependency, so sue me.
+drsh_jq_available() {
+    drsh_cmd_available "jq"
+}
+# Checks if [spark](https://github.com/holman/spark) is available, it's used to
+# render the spark lines.
+drsh_spark_available() {
+    drsh_cmd_available "spark"
+}
+
+drsh_geocode_usage() {
+    cat <<EOF
+
+    USAGE:
+      drsh_geocode ADDRESS
+
+EOF
+}
+
+# Tries to lookup an address, and will spit out something like:
+#      drsh_geocode "Kontich"
+#      => 51.131279 4.44784 'Kontich, Belgium'
+drsh_geocode() {
+    # Display banner if no arguments given
+    if (( $# < 1 ));then
+        drsh_geocode_usage; return 1;
+    fi
+
+    # Use Google for geocoding the user's input. [More info](https://developers.google.com/maps/documentation/geocoding/)
+    drsh_geocode_url="http://maps.googleapis.com/maps/api/geocode/json?sensor=false"
+
+    # Check for `jq`
+    if drsh_jq_available; then
+        # Get the JSON formatted response by Google, trying to use `curl`'s auto-
+        # escaping.
+        curl -sS -G --data-urlencode address="$@" "${url}" |
+        # Parse out the lat, lng and formatted address and make sure it's fitted
+        # to be used in a shell script
+        jq -r '(.results[0] | [(.geometry.location | .lat,.lng), .formatted_address]) | @sh'
+    else
+        # jq not available, just dump the json response
+        curl -sS -G --data-urlencode address="$@" "${url}"
+    fi
+}
+
+#
+# ### Text Helpers
+#
+# Renders a text to display a missing dependency, takes two arguments
+# $1 - Name of dependency
+# $2 - Link to homepage of dependency
+drsh_depenceny_text() {
+    cat <<EOF
+
+    Drsh has a dependency on $1[0], please make sure it's somewhere in your path.
+
+    [0] $2
+EOF
+}
+
+drsh_jq_dependency() { drsh_depenceny_text "jq" "http://stedolan.github.io/jq/"}
+drsh_spark_dependency() { drsh_depenceny_text "spark" "https://github.com/holman/spark"}
+
+drsh_help() {
+    cat <<EOF
+
+    USAGE:
+      drsh [-h|--help] CITY
+
+    EXAMPLES:
+      drsh Leuven
+      ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█▇▁▁▁▁▁▁ (Leuven, Belgium)
+      echo "10to1, Kontich" | drsh
+      ▆▆▇█▇▆▆▆▁▁▁▁▇▁▁▁▁▁▁▁▁▁▁▁▁ (Kontich, Belgium)
+EOF
+}
+
+# ## The actual function
+drsh() {
+    # Display banner if needed
+    if { [ -z "$1" ] && [ -t 0 ] ; } || [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
+        drsh_help; return 1;
+    fi
+    # Check dependencies
+    if ! drsh_jq_available; then drsh_jq_dependency; return 1; fi
+    if ! drsh_spark_available; then drsh_spark_dependency; return 1; fi
+
+    # Good to to. First get the input
+	  if [ -p /dev/stdin ]; then
+        local drsh_input=${@:-`cat`}
+
+	  else
+        local drsh_input=$1
+    fi
+    # Now look up its coordinates
+    in=$(drsh_geocode $drsh_input)
+    if [ ! -z "$in" ]; then
+        lat=$(echo $in | cut -f1 -d " ") # Split on " " and get 1st result
+        lng=$(echo $in | cut -f2 -d " ") # Split on " " and get 2nd result
+        cty=$(echo $in | cut -f2 -d "'") # Split on ' and get 2nd result
+
+        # Fetch data from Buienradar, they return data in this format:
+        #
+        #       000|22:20
+        #       000|22:25
+        #       ...
+        #       084|00:20
+        #
+        # The first part defines the amount of rain (255 is max). More info
+        # here: http://gps.buienradar.nl/
+        printf $(curl -sS "http://gps.buienradar.nl/getrr.php?lat=$lat&lon=$lng" |
+        # split on "|"
+        cut -f1 -d "|"                                                 |
+        # parse to string
+        bc                                                             |
+        # create a sparkline
+        spark)
+        # Print looked up formatted address
+        printf " ($cty)\n"
+        # Done.
+    else
+        cat <<EOF
+
+    Hmm. Couldn't fetch the latitude and longitude.
+    Internetz down?
+
+EOF
+        return 1;
+    fi
+}
