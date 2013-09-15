@@ -41,7 +41,7 @@
               <div class="pilwrap for-h1">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <h1>DRSH</h1>
+              <h1>DRSH - 0.0.1</h1>
 <p>I&#39;m a long time user of <a href="http://dra.sh/">Drash</a>, an iPhone app that quickly
 looks up if it&#39;s going to rain or not. I&#39;ve asked @inferis about a Mac version
 but sadly he doesn&#39;t have the time at the moment. So to scratch my own personal
@@ -179,7 +179,9 @@ drsh_geocode_usage() {
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    drsh_geocode_url=<span class="string">"http://maps.googleapis.com/maps/api/geocode/json?sensor=false"</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>    drsh_geocode_url=<span class="string">"http://maps.googleapis.com/maps/api/geocode/json?sensor=false"</span>
+
+    local location=<span class="variable">${</span>@<span class="symbol">:-`cat`</span>}</pre></div></div>
             
         </li>
         
@@ -210,7 +212,7 @@ escaping.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        curl -sS -<span class="constant">G</span> --data-urlencode address=<span class="string">"$@"</span> <span class="string">"${url}"</span> |</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        curl -sS -<span class="constant">G</span> --data-urlencode address=<span class="string">"$location"</span> <span class="string">"${drsh_geocode_url}"</span> |</pre></div></div>
             
         </li>
         
@@ -242,7 +244,7 @@ to be used in a shell script</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        curl -sS -<span class="constant">G</span> --data-urlencode address=<span class="string">"$@"</span> <span class="string">"${url}"</span>
+            <div class="content"><div class='highlight'><pre>        curl -sS -<span class="constant">G</span> --data-urlencode address=<span class="string">"$location"</span> <span class="string">"${drsh_geocode_url}"</span>
     fi
 }</pre></div></div>
             
@@ -271,8 +273,8 @@ $2 - Link to homepage of dependency</p>
 EOF
 }
 
-drsh_jq_dependency() { drsh_depenceny_text "jq" "http://stedolan.github.io/jq/"}
-drsh_spark_dependency() { drsh_depenceny_text "spark" "https://github.com/holman/spark"}
+drsh_jq_dependency() { drsh_depenceny_text "jq" "http://stedolan.github.io/jq/";}
+drsh_spark_dependency() { drsh_depenceny_text "spark" "https://github.com/holman/spark";}
 
 drsh_help() {
     cat &lt;&lt;EOF
@@ -312,13 +314,15 @@ EOF
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>Display banner if needed</p>
+              <p>Now look up its coordinates</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> { [ -z <span class="string">"$1"</span> ] &amp;&amp; [ -t <span class="number">0</span> ] ; } || [ <span class="string">"$1"</span> = <span class="string">'-h'</span> ] || [ <span class="string">"$1"</span> = <span class="string">'--help'</span> ]; <span class="keyword">then</span>
-        drsh_help; <span class="keyword">return</span> <span class="number">1</span>;
-    fi</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">in</span>=<span class="variable">$(</span>drsh_geocode <span class="variable">$@</span>)
+    <span class="keyword">if</span> [ ! -z <span class="string">"$in"</span> ]; <span class="keyword">then</span>
+        lat=<span class="variable">$(</span>echo <span class="variable">$in</span> | cut -f1 -d <span class="string">" "</span>) <span class="comment"># Split on " " and get 1st result</span>
+        lng=<span class="variable">$(</span>echo <span class="variable">$in</span> | cut -f2 -d <span class="string">" "</span>) <span class="comment"># Split on " " and get 2nd result</span>
+        cty=<span class="variable">$(</span>echo <span class="variable">$in</span> | cut -f2 -d <span class="string">"'"</span>) <span class="comment"># Split on ' and get 2nd result</span></pre></div></div>
             
         </li>
         
@@ -328,61 +332,6 @@ EOF
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
-              </div>
-              <p>Check dependencies</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> ! drsh_jq_available; <span class="keyword">then</span> drsh_jq_dependency; <span class="keyword">return</span> <span class="number">1</span>; fi
-    <span class="keyword">if</span> ! drsh_spark_available; <span class="keyword">then</span> drsh_spark_dependency; <span class="keyword">return</span> <span class="number">1</span>; fi</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-16">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
-              </div>
-              <p>Good to to. First get the input</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>	  <span class="keyword">if</span> [ -p /dev/stdin ]; <span class="keyword">then</span>
-        local drsh_input=<span class="variable">${</span>@<span class="symbol">:-`cat`</span>}
-
-	  <span class="keyword">else</span>
-        local drsh_input=<span class="variable">$1</span>
-    fi</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-17">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
-              </div>
-              <p>Now look up its coordinates</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">in</span>=<span class="variable">$(</span>drsh_geocode <span class="variable">$drsh_input</span>)
-    <span class="keyword">if</span> [ ! -z <span class="string">"$in"</span> ]; <span class="keyword">then</span>
-        lat=<span class="variable">$(</span>echo <span class="variable">$in</span> | cut -f1 -d <span class="string">" "</span>) <span class="comment"># Split on " " and get 1st result</span>
-        lng=<span class="variable">$(</span>echo <span class="variable">$in</span> | cut -f2 -d <span class="string">" "</span>) <span class="comment"># Split on " " and get 2nd result</span>
-        cty=<span class="variable">$(</span>echo <span class="variable">$in</span> | cut -f2 -d <span class="string">"'"</span>) <span class="comment"># Split on ' and get 2nd result</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-18">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>Fetch data from Buienradar, they return data in this format:</p>
 <pre><code>  000|22:20
@@ -399,56 +348,56 @@ here: <a href="http://gps.buienradar.nl/">http://gps.buienradar.nl/</a></p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>split on &quot;|&quot;</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        cut -f1 -d <span class="string">"|"</span>                                                 |</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            cut -f1 -d <span class="string">"|"</span>                                                 |</pre></div></div>
             
         </li>
         
         
-        <li id="section-20">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>parse to string</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        bc                                                             |</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            bc                                                             |</pre></div></div>
             
         </li>
         
         
-        <li id="section-21">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>create a sparkline</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        spark)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            spark)</pre></div></div>
             
         </li>
         
         
-        <li id="section-22">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>Print looked up formatted address</p>
 
@@ -459,11 +408,11 @@ here: <a href="http://gps.buienradar.nl/">http://gps.buienradar.nl/</a></p>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>Done.</p>
 
@@ -478,7 +427,45 @@ here: <a href="http://gps.buienradar.nl/">http://gps.buienradar.nl/</a></p>
 EOF
         return 1;
     fi
-}</pre></div></div>
+}
+
+if [ "$BASH_SOURCE" == "$0" ]; then</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>Display banner if needed</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> { [ -z <span class="string">"$1"</span> ] &amp;&amp; [ -t <span class="number">0</span> ] ; } || [ <span class="string">"$1"</span> = <span class="string">'-h'</span> ] || [ <span class="string">"$1"</span> = <span class="string">'--help'</span> ]; <span class="keyword">then</span>
+        drsh_help; exit <span class="number">0</span>;
+    fi</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>Check dependencies</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> ! drsh_jq_available; <span class="keyword">then</span> drsh_jq_dependency; exit <span class="number">1</span>; fi
+    <span class="keyword">if</span> ! drsh_spark_available; <span class="keyword">then</span> drsh_spark_dependency; exit <span class="number">1</span>; fi
+
+    drsh <span class="variable">${</span>@<span class="symbol">:-`cat`</span>}
+fi</pre></div></div>
             
         </li>
         
