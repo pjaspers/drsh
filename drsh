@@ -83,17 +83,18 @@ drsh_geocode() {
     # Use Google for geocoding the user's input. [More info](https://developers.google.com/maps/documentation/geocoding/)
     drsh_geocode_url="http://maps.googleapis.com/maps/api/geocode/json?sensor=false"
 
+    local location=${@:-`cat`}
     # Check for `jq`
     if drsh_jq_available; then
         # Get the JSON formatted response by Google, trying to use `curl`'s auto-
         # escaping.
-        curl -sS -G --data-urlencode address="$@" "${drsh_geocode_url}" |
+        curl -sS -G --data-urlencode address="$location" "${drsh_geocode_url}" |
         # Parse out the lat, lng and formatted address and make sure it's fitted
         # to be used in a shell script
         jq -r '(.results[0] | [(.geometry.location | .lat,.lng), .formatted_address]) | @sh'
     else
         # jq not available, just dump the json response
-        curl -sS -G --data-urlencode address="$@" "${drsh_geocode_url}"
+        curl -sS -G --data-urlencode address="$location" "${drsh_geocode_url}"
     fi
 }
 
