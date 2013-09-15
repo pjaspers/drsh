@@ -113,8 +113,8 @@ drsh_depenceny_text() {
 EOF
 }
 
-drsh_jq_dependency() { drsh_depenceny_text "jq" "http://stedolan.github.io/jq/"}
-drsh_spark_dependency() { drsh_depenceny_text "spark" "https://github.com/holman/spark"}
+drsh_jq_dependency() { drsh_depenceny_text "jq" "http://stedolan.github.io/jq/";}
+drsh_spark_dependency() { drsh_depenceny_text "spark" "https://github.com/holman/spark";}
 
 drsh_help() {
     cat <<EOF
