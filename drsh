@@ -132,23 +132,8 @@ EOF
 
 # ## The actual function
 drsh() {
-    # Display banner if needed
-    if { [ -z "$1" ] && [ -t 0 ] ; } || [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
-        drsh_help; return 1;
-    fi
-    # Check dependencies
-    if ! drsh_jq_available; then drsh_jq_dependency; return 1; fi
-    if ! drsh_spark_available; then drsh_spark_dependency; return 1; fi
-
-    # Good to to. First get the input
-	  if [ -p /dev/stdin ]; then
-        local drsh_input=${@:-`cat`}
-
-	  else
-        local drsh_input=$1
-    fi
     # Now look up its coordinates
-    in=$(drsh_geocode $drsh_input)
+    in=$(drsh_geocode $@)
     if [ ! -z "$in" ]; then
         lat=$(echo $in | cut -f1 -d " ") # Split on " " and get 1st result
         lng=$(echo $in | cut -f2 -d " ") # Split on " " and get 2nd result
@@ -164,12 +149,12 @@ drsh() {
         # The first part defines the amount of rain (255 is max). More info
         # here: http://gps.buienradar.nl/
         printf $(curl -sS "http://gps.buienradar.nl/getrr.php?lat=$lat&lon=$lng" |
-        # split on "|"
-        cut -f1 -d "|"                                                 |
-        # parse to string
-        bc                                                             |
-        # create a sparkline
-        spark)
+            # split on "|"
+            cut -f1 -d "|"                                                 |
+            # parse to string
+            bc                                                             |
+            # create a sparkline
+            spark)
         # Print looked up formatted address
         printf " ($cty)\n"
         # Done.
@@ -183,3 +168,16 @@ EOF
         return 1;
     fi
 }
+
+if [ "$BASH_SOURCE" == "$0" ]; then
+    # Display banner if needed
+    if { [ -z "$1" ] && [ -t 0 ] ; } || [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
+        drsh_help; exit 0;
+    fi
+
+    # Check dependencies
+    if ! drsh_jq_available; then drsh_jq_dependency; exit 1; fi
+    if ! drsh_spark_available; then drsh_spark_dependency; exit 1; fi
+
+    drsh ${@:-`cat`}
+fi
