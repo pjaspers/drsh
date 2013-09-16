@@ -20,6 +20,12 @@ be ready to go. It does have two dependencies [jq](http://stedolan.github.io/jq/
 
 (Homebrew has them both, so `brew install jq && brew install spark`).
 
+(Here's to the lazy ones. The unfits. The rebels. The troublemakers. The round pegs in
+the square holes:
+
+     brew install https://gist.github.com/pjaspers/6577968/raw/2980704fbce8407ebeeb3d03f2663abba81191c6/drsh.rb
+)
+
 # What's missing?
 
 1. At this point in time the bars don't actually reflect the amount of rain that will
