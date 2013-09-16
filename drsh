@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# # DRSH - 0.0.1
+# # DRSH - 0.0.2
 #
 # I'm a long time user of [Drash](http://dra.sh/), an iPhone app that quickly
 # looks up if it's going to rain or not. I've asked @inferis about a Mac version
@@ -22,6 +22,13 @@
 #
 # (Homebrew has them both, so `brew install jq && brew install spark`).
 #
+# (Here's to the lazy ones. The unfits. The rebels. The troublemakers. The round pegs in
+# the square holes:
+#
+#      brew install https://gist.github.com/pjaspers/6577968/raw/2980704fbce8407ebeeb3d03f2663abba81191c6/drsh.rb
+#
+# )
+
 # # What's missing?
 #
 # 1. At this point in time the bars don't actually reflect the amount of rain that will
