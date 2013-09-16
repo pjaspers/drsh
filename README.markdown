@@ -26,6 +26,9 @@ the square holes:
      brew install https://gist.github.com/pjaspers/6577968/raw/2980704fbce8407ebeeb3d03f2663abba81191c6/drsh.rb
 )
 
+Or you could do: `curl -O https://raw.github.com/pjaspers/drsh/master/drsh` to a place
+in your `$PATH`.
+
 # What's missing?
 
 1. At this point in time the bars don't actually reflect the amount of rain that will

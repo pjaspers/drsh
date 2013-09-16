@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
-# # DRSH - 0.0.2
+# # DRSH - 0.0.3
 #
 # I'm a long time user of [Drash](http://dra.sh/), an iPhone app that quickly
 # looks up if it's going to rain or not. I've asked @inferis about a Mac version
@@ -28,7 +28,10 @@
 #      brew install https://gist.github.com/pjaspers/6577968/raw/2980704fbce8407ebeeb3d03f2663abba81191c6/drsh.rb
 #
 # )
-
+#
+# Or you could do: `curl -O https://raw.github.com/pjaspers/drsh/master/drsh` to a place
+# in your `$PATH`.
+#
 # # What's missing?
 #
 # 1. At this point in time the bars don't actually reflect the amount of rain that will
@@ -176,6 +179,7 @@ EOF
     fi
 }
 
+# If the file is being sourced, don't run it.
 if [ "$BASH_SOURCE" == "$0" ]; then
     # Display banner if needed
     if { [ -z "$1" ] && [ -t 0 ] ; } || [ "$1" = '-h' ] || [ "$1" = '--help' ]; then
