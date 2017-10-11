@@ -158,7 +158,7 @@ drsh() {
         #
         # The first part defines the amount of rain (255 is max). More info
         # here: http://gps.buienradar.nl/
-        printf $(curl -sS "http://gps.buienradar.nl/getrr.php?lat=$lat&lon=$lng" |
+        printf $(curl -LsS "http://gps.buienradar.nl/getrr.php?lat=$lat&lon=$lng" |
             # split on "|"
             cut -f1 -d "|"                                                 |
             # parse to string
