@@ -23,7 +23,7 @@ be ready to go. It does have two dependencies [jq](http://stedolan.github.io/jq/
 (Here's to the lazy ones. The unfits. The rebels. The troublemakers. The round pegs in
 the square holes:
 
-     brew install https://gist.github.com/pjaspers/6577968/raw/2980704fbce8407ebeeb3d03f2663abba81191c6/drsh.rb
+     brew install https://gist.githubusercontent.com/pjaspers/6577968/raw/fb5ef7ceaa8dd661905468d588aaa1738037524d/drsh.rb
 )
 
 Or you could do: `curl -O https://raw.github.com/pjaspers/drsh/master/drsh` to a place
