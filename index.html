@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>drsh</title>
+  <title>DRSH - 0.0.3</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -10,268 +10,265 @@
 <body>
   <div id="container">
     <div id="background"></div>
-
+    
     <ul class="sections">
-
-          <li id="title">
-              <div class="annotation">
-                  <h1>drsh</h1>
-              </div>
-          </li>
-
-
-
+        
+        
+        
         <li id="section-1">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-
+              
             </div>
-
-            <div class="content"><div class='highlight'><pre><span class="comment">#!/bin/sh</span></pre></div></div>
-
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-meta">#!/usr/bin/env bash
+</span></pre></div></div>
+            
         </li>
-
-
+        
+        
         <li id="section-2">
             <div class="annotation">
-
-              <div class="pilwrap for-h1">
+              
+              <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <h1>DRSH - 0.0.2</h1>
-<p>I&#39;m a long time user of <a href="http://dra.sh/">Drash</a>, an iPhone app that quickly
-looks up if it&#39;s going to rain or not. I&#39;ve asked @inferis about a Mac version
-but sadly he doesn&#39;t have the time at the moment. So to scratch my own personal
+              <h1 id="drsh-0-0-3">DRSH - 0.0.3</h1>
+<p>I’m a long time user of <a href="http://dra.sh/">Drash</a>, an iPhone app that quickly
+looks up if it’s going to rain or not. I’ve asked @inferis about a Mac version
+but sadly he doesn’t have the time at the moment. So to scratch my own personal
 itch, and learn more about the exciting world of shell scripting:</p>
-<pre><code>  DRSH - Drash for the command line</code></pre>
-<h1>What does it do?</h1>
+<pre><code>  DRSH - Drash <span class="hljs-keyword">for</span> the <span class="hljs-built_in">command</span> line
+</code></pre><h1 id="what-does-it-do-">What does it do?</h1>
 <pre><code> drsh Achel
- =&gt; ▁▁▆▇▇▇██▇▆▆▇▇▆▁▁▁▆▆▁▁▁▁▁▁ (3930 Achel, Belgium)</code></pre>
-<h1>How do I install it?</h1>
+ =&gt; ▁▁▆▇▇▇██▇▆▆▇▇▆▁▁▁▆▆▁▁▁▁▁▁ (3930 Achel, Belgium)
+</code></pre><h1 id="how-do-i-install-it-">How do I install it?</h1>
 <p><code>drsh</code> is a simple shell script, so drop it anywhere in your <code>$PATH</code> and you should
 be ready to go. It does have two dependencies <a href="http://stedolan.github.io/jq/">jq</a> and
 <a href="https://github.com/holman/spark">spark</a>, but those are simple to install.</p>
 <p>(Homebrew has them both, so <code>brew install jq &amp;&amp; brew install spark</code>).</p>
-<p>(Here&#39;s to the lazy ones. The unfits. The rebels. The troublemakers. The round pegs in
+<p>(Here’s to the lazy ones. The unfits. The rebels. The troublemakers. The round pegs in
 the square holes:</p>
-<pre><code> brew install https://gist.github.com/pjaspers/6577968/raw/2980704fbce8407ebeeb3d03f2663abba81191c6/drsh.rb</code></pre>
-<p>)</p>
-<h1>What&#39;s missing?</h1>
+<pre><code> brew install https://gist.github.com/pjaspers/6577968/raw/2980704fbce8407ebeeb3d03f2663abba81191c6/drsh.rb
+</code></pre><p>)</p>
+<p>Or you could do: <code>curl -O https://raw.github.com/pjaspers/drsh/master/drsh</code> to a place
+in your <code>$PATH</code>.</p>
+<h1 id="what-s-missing-">What’s missing?</h1>
 <ol>
-<li><p>At this point in time the bars don&#39;t actually reflect the amount of rain that will
+<li><p>At this point in time the bars don’t actually reflect the amount of rain that will
 fall, I just pass the data on to <a href="https://github.com/holman/spark">spark</a> and it
 assumes that the highest number I pass in is the maximum (but max is actually 255).</p>
 </li>
-<li><p>International support? But since I&#39;m probably not going to need this, send me a
+<li><p>International support? But since I’m probably not going to need this, send me a
 patch if you need it.</p>
 </li>
-<li><p>Less dependencies. I&#39;ll admit I mainly used <code>jq</code> to mess around with it, I&#39;m pretty
+<li><p>Less dependencies. I’ll admit I mainly used <code>jq</code> to mess around with it, I’m pretty
 sure we could ditch it and do some fancy <code>grep</code>, <code>awk</code>,<code>sed</code> and get the same results
 without the dependency. Likewise for <code>spark</code>, it would be better to just show the chance
-of rain if <code>spark</code> wasn&#39;t found.</p>
+of rain if <code>spark</code> wasn’t found.</p>
 </li>
 <li><p>More cowbell</p>
 </li>
 </ol>
 <p><strong>Anyhoe. On to the code!</strong></p>
-<h2>Helpers</h2>
+<h2 id="helpers">Helpers</h2>
 <p>Helper function to determine if a function is available or not.</p>
 
             </div>
-
-            <div class="content"><div class='highlight'><pre>drsh_cmd_available() {
-    <span class="keyword">if</span> command -v <span class="variable">$1</span> &gt;<span class="regexp">/dev/null</span> <span class="number">2</span>&gt;&amp;<span class="number">1</span>; <span class="keyword">then</span>
-        <span class="keyword">return</span> <span class="number">0</span>
-    <span class="keyword">else</span>
-        <span class="keyword">return</span> <span class="number">1</span>
-    fi
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">drsh_cmd_available</span></span>() {
+    <span class="hljs-keyword">if</span> <span class="hljs-built_in">command</span> -v <span class="hljs-variable">$1</span> &gt;/dev/null 2&gt;&amp;1; <span class="hljs-keyword">then</span>
+        <span class="hljs-built_in">return</span> 0
+    <span class="hljs-keyword">else</span>
+        <span class="hljs-built_in">return</span> 1
+    <span class="hljs-keyword">fi</span>
 }</pre></div></div>
-
+            
         </li>
-
-
+        
+        
         <li id="section-3">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>Checks if <a href="http://stedolan.github.io/jq/">jq</a> is available, it&#39;s used to
-parse the JSON returned from the Google API. It&#39;s good, it&#39;s small. But it is
+              <p>Checks if <a href="http://stedolan.github.io/jq/">jq</a> is available, it’s used to
+parse the JSON returned from the Google API. It’s good, it’s small. But it is
 a dependency, so sue me.</p>
 
             </div>
-
-            <div class="content"><div class='highlight'><pre>drsh_jq_available() {
-    drsh_cmd_available <span class="string">"jq"</span>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">drsh_jq_available</span></span>() {
+    drsh_cmd_available <span class="hljs-string">"jq"</span>
 }</pre></div></div>
-
+            
         </li>
-
-
+        
+        
         <li id="section-4">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>Checks if <a href="https://github.com/holman/spark">spark</a> is available, it&#39;s used to
+              <p>Checks if <a href="https://github.com/holman/spark">spark</a> is available, it’s used to
 render the spark lines.</p>
 
             </div>
-
-            <div class="content"><div class='highlight'><pre>drsh_spark_available() {
-    drsh_cmd_available <span class="string">"spark"</span>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">drsh_spark_available</span></span>() {
+    drsh_cmd_available <span class="hljs-string">"spark"</span>
 }
 
-drsh_geocode_usage() {
-    cat &lt;&lt;<span class="constant">EOF</span>
+<span class="hljs-function"><span class="hljs-title">drsh_geocode_usage</span></span>() {
+    cat &lt;&lt;EOF
 
-    <span class="constant">USAGE</span><span class="symbol">:</span>
-      drsh_geocode <span class="constant">ADDRESS</span>
+    USAGE:
+      drsh_geocode ADDRESS
 
-<span class="constant">EOF</span>
+EOF
 }</pre></div></div>
-
+            
         </li>
-
-
+        
+        
         <li id="section-5">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
               <p>Tries to lookup an address, and will spit out something like:
-     drsh_geocode &quot;Kontich&quot;
-     =&gt; 51.131279 4.44784 &#39;Kontich, Belgium&#39;</p>
+     drsh_geocode “Kontich”
+     =&gt; 51.131279 4.44784 ‘Kontich, Belgium’</p>
 
             </div>
-
-            <div class="content"><div class='highlight'><pre>drsh_geocode() {</pre></div></div>
-
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">drsh_geocode</span></span>() {</pre></div></div>
+            
         </li>
-
-
+        
+        
         <li id="section-6">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
               <p>Display banner if no arguments given</p>
 
             </div>
-
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (( <span class="variable">$#</span> &lt; <span class="number">1</span> ));<span class="keyword">then</span>
-        drsh_geocode_usage; <span class="keyword">return</span> <span class="number">1</span>;
-    fi</pre></div></div>
-
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (( <span class="hljs-variable">$#</span> &lt; 1 ));<span class="hljs-keyword">then</span>
+        drsh_geocode_usage; <span class="hljs-built_in">return</span> 1;
+    <span class="hljs-keyword">fi</span></pre></div></div>
+            
         </li>
-
-
+        
+        
         <li id="section-7">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>Use Google for geocoding the user&#39;s input. <a href="https://developers.google.com/maps/documentation/geocoding/">More info</a></p>
+              <p>Use Google for geocoding the user’s input. <a href="https://developers.google.com/maps/documentation/geocoding/">More info</a></p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>    drsh_geocode_url=<span class="hljs-string">"http://maps.googleapis.com/maps/api/geocode/json?sensor=false"</span>
 
-            <div class="content"><div class='highlight'><pre>    drsh_geocode_url=<span class="string">"http://maps.googleapis.com/maps/api/geocode/json?sensor=false"</span>
-
-    local location=<span class="variable">${</span>@<span class="symbol">:-`cat`</span>}</pre></div></div>
-
+    <span class="hljs-built_in">local</span> location=<span class="hljs-variable">${@:-`cat`}</span></pre></div></div>
+            
         </li>
-
-
+        
+        
         <li id="section-8">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <p>Check for <code>jq</code></p>
 
             </div>
-
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> drsh_jq_available; <span class="keyword">then</span></pre></div></div>
-
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> drsh_jq_available; <span class="hljs-keyword">then</span></pre></div></div>
+            
         </li>
-
-
+        
+        
         <li id="section-9">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <p>Get the JSON formatted response by Google, trying to use <code>curl</code>&#39;s auto-
+              <p>Get the JSON formatted response by Google, trying to use <code>curl</code>‘s auto-
 escaping.</p>
 
             </div>
-
-            <div class="content"><div class='highlight'><pre>        curl -sS -<span class="constant">G</span> --data-urlencode address=<span class="string">"$location"</span> <span class="string">"${drsh_geocode_url}"</span> |</pre></div></div>
-
+            
+            <div class="content"><div class='highlight'><pre>        curl -sS -G --data-urlencode address=<span class="hljs-string">"<span class="hljs-variable">$location</span>"</span> <span class="hljs-string">"<span class="hljs-variable">${drsh_geocode_url}</span>"</span> |</pre></div></div>
+            
         </li>
-
-
+        
+        
         <li id="section-10">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p>Parse out the lat, lng and formatted address and make sure it&#39;s fitted
+              <p>Parse out the lat, lng and formatted address and make sure it’s fitted
 to be used in a shell script</p>
 
             </div>
-
-            <div class="content"><div class='highlight'><pre>        jq -r <span class="string">'(.results[0] | [(.geometry.location | .lat,.lng), .formatted_address]) | @sh'</span>
-    <span class="keyword">else</span></pre></div></div>
-
+            
+            <div class="content"><div class='highlight'><pre>        jq -r <span class="hljs-string">'(.results[0] | [(.geometry.location | .lat,.lng), .formatted_address]) | @sh'</span>
+    <span class="hljs-keyword">else</span></pre></div></div>
+            
         </li>
-
-
+        
+        
         <li id="section-11">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p>jq not available, just dump the json response</p>
 
             </div>
-
-            <div class="content"><div class='highlight'><pre>        curl -sS -<span class="constant">G</span> --data-urlencode address=<span class="string">"$location"</span> <span class="string">"${drsh_geocode_url}"</span>
-    fi
+            
+            <div class="content"><div class='highlight'><pre>        curl -sS -G --data-urlencode address=<span class="hljs-string">"<span class="hljs-variable">$location</span>"</span> <span class="hljs-string">"<span class="hljs-variable">${drsh_geocode_url}</span>"</span>
+    <span class="hljs-keyword">fi</span>
 }</pre></div></div>
-
+            
         </li>
-
-
+        
+        
         <li id="section-12">
             <div class="annotation">
-
-              <div class="pilwrap for-h3">
+              
+              <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              <h3>Text Helpers</h3>
+              <h3 id="text-helpers">Text Helpers</h3>
 <p>Renders a text to display a missing dependency, takes two arguments
 $1 - Name of dependency
 $2 - Link to homepage of dependency</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">drsh_depenceny_text</span></span>() {
+    cat &lt;&lt;EOF
 
-            <div class="content"><div class='highlight'><pre>drsh_depenceny_text() {
-    cat &lt;&lt;<span class="constant">EOF</span>
-
-    <span class="constant">Drsh</span> has a dependency on <span class="variable">$1</span>[<span class="number">0</span>], please make sure it<span class="string">'s somewhere in your path.
+    Drsh has a dependency on <span class="hljs-variable">$1</span>[0], please make sure it<span class="hljs-string">'s somewhere in your path.
 
     [0] $2
 EOF
@@ -292,48 +289,50 @@ drsh_help() {
       echo "10to1, Kontich" | drsh
       ▆▆▇█▇▆▆▆▁▁▁▁▇▁▁▁▁▁▁▁▁▁▁▁▁ (Kontich, Belgium)
 EOF
-}</pre></div></div>
+}
 
+</span></pre></div></div>
+            
         </li>
-
-
+        
+        
         <li id="section-13">
             <div class="annotation">
-
-              <div class="pilwrap for-h2">
+              
+              <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <h2>The actual function</h2>
+              <h2 id="the-actual-function">The actual function</h2>
 
             </div>
-
-            <div class="content"><div class='highlight'><pre>drsh() {</pre></div></div>
-
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">drsh</span></span>() {</pre></div></div>
+            
         </li>
-
-
+        
+        
         <li id="section-14">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>Now look up its coordinates</p>
 
             </div>
-
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">in</span>=<span class="variable">$(</span>drsh_geocode <span class="variable">$@</span>)
-    <span class="keyword">if</span> [ ! -z <span class="string">"$in"</span> ]; <span class="keyword">then</span>
-        lat=<span class="variable">$(</span>echo <span class="variable">$in</span> | cut -f1 -d <span class="string">" "</span>) <span class="comment"># Split on " " and get 1st result</span>
-        lng=<span class="variable">$(</span>echo <span class="variable">$in</span> | cut -f2 -d <span class="string">" "</span>) <span class="comment"># Split on " " and get 2nd result</span>
-        cty=<span class="variable">$(</span>echo <span class="variable">$in</span> | cut -f2 -d <span class="string">"'"</span>) <span class="comment"># Split on ' and get 2nd result</span></pre></div></div>
-
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">in</span>=$(drsh_geocode <span class="hljs-variable">$@</span>)
+    <span class="hljs-keyword">if</span> [ ! -z <span class="hljs-string">"<span class="hljs-variable">$in</span>"</span> ]; <span class="hljs-keyword">then</span>
+        lat=$(<span class="hljs-built_in">echo</span> <span class="hljs-variable">$in</span> | cut -f1 -d <span class="hljs-string">" "</span>) <span class="hljs-comment"># Split on " " and get 1st result</span>
+        lng=$(<span class="hljs-built_in">echo</span> <span class="hljs-variable">$in</span> | cut -f2 -d <span class="hljs-string">" "</span>) <span class="hljs-comment"># Split on " " and get 2nd result</span>
+        cty=$(<span class="hljs-built_in">echo</span> <span class="hljs-variable">$in</span> | cut -f2 -d <span class="hljs-string">"'"</span>) <span class="hljs-comment"># Split on ' and get 2nd result</span></pre></div></div>
+            
         </li>
-
-
+        
+        
         <li id="section-15">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
@@ -341,91 +340,91 @@ EOF
 <pre><code>  000|22:20
   000|22:25
   ...
-  084|00:20</code></pre>
-<p>The first part defines the amount of rain (255 is max). More info
+  084|00:20
+</code></pre><p>The first part defines the amount of rain (255 is max). More info
 here: <a href="http://gps.buienradar.nl/">http://gps.buienradar.nl/</a></p>
 
             </div>
-
-            <div class="content"><div class='highlight'><pre>        printf <span class="variable">$(</span>curl -sS <span class="string">"http://gps.buienradar.nl/getrr.php?lat=$lat&amp;lon=$lng"</span> |</pre></div></div>
-
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-built_in">printf</span> $(curl -LsS <span class="hljs-string">"http://gps.buienradar.nl/getrr.php?lat=<span class="hljs-variable">$lat</span>&amp;lon=<span class="hljs-variable">$lng</span>"</span> |</pre></div></div>
+            
         </li>
-
-
+        
+        
         <li id="section-16">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
-              <p>split on &quot;|&quot;</p>
+              <p>split on “|”</p>
 
             </div>
-
-            <div class="content"><div class='highlight'><pre>            cut -f1 -d <span class="string">"|"</span>                                                 |</pre></div></div>
-
+            
+            <div class="content"><div class='highlight'><pre>            cut -f1 -d <span class="hljs-string">"|"</span>                                                 |</pre></div></div>
+            
         </li>
-
-
+        
+        
         <li id="section-17">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>parse to string</p>
 
             </div>
-
+            
             <div class="content"><div class='highlight'><pre>            bc                                                             |</pre></div></div>
-
+            
         </li>
-
-
+        
+        
         <li id="section-18">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>create a sparkline</p>
 
             </div>
-
+            
             <div class="content"><div class='highlight'><pre>            spark)</pre></div></div>
-
+            
         </li>
-
-
+        
+        
         <li id="section-19">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>Print looked up formatted address</p>
 
             </div>
-
-            <div class="content"><div class='highlight'><pre>        printf <span class="string">" ($cty)\n"</span></pre></div></div>
-
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-built_in">printf</span> <span class="hljs-string">" (<span class="hljs-variable">$cty</span>)\n"</span></pre></div></div>
+            
         </li>
-
-
+        
+        
         <li id="section-20">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>Done.</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">else</span>
+        cat &lt;&lt;EOF
 
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">else</span>
-        cat &lt;&lt;<span class="constant">EOF</span>
-
-    <span class="constant">Hmm</span>. <span class="constant">Couldn</span><span class="string">'t fetch the latitude and longitude.
+    Hmm. Couldn<span class="hljs-string">'t fetch the latitude and longitude.
     Internetz down?
 
 EOF
@@ -433,46 +432,61 @@ EOF
     fi
 }
 
-if [ "$BASH_SOURCE" == "$0" ]; then</pre></div></div>
-
+</span></pre></div></div>
+            
         </li>
-
-
+        
+        
         <li id="section-21">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>If the file is being sourced, don’t run it.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">if</span> [ <span class="hljs-string">"<span class="hljs-variable">$BASH_SOURCE</span>"</span> == <span class="hljs-string">"<span class="hljs-variable">$0</span>"</span> ]; <span class="hljs-keyword">then</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>Display banner if needed</p>
 
             </div>
-
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> { [ -z <span class="string">"$1"</span> ] &amp;&amp; [ -t <span class="number">0</span> ] ; } || [ <span class="string">"$1"</span> = <span class="string">'-h'</span> ] || [ <span class="string">"$1"</span> = <span class="string">'--help'</span> ]; <span class="keyword">then</span>
-        drsh_help; exit <span class="number">0</span>;
-    fi</pre></div></div>
-
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> { [ -z <span class="hljs-string">"<span class="hljs-variable">$1</span>"</span> ] &amp;&amp; [ -t 0 ] ; } || [ <span class="hljs-string">"<span class="hljs-variable">$1</span>"</span> = <span class="hljs-string">'-h'</span> ] || [ <span class="hljs-string">"<span class="hljs-variable">$1</span>"</span> = <span class="hljs-string">'--help'</span> ]; <span class="hljs-keyword">then</span>
+        drsh_help; <span class="hljs-built_in">exit</span> 0;
+    <span class="hljs-keyword">fi</span></pre></div></div>
+            
         </li>
-
-
-        <li id="section-22">
+        
+        
+        <li id="section-23">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>Check dependencies</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> ! drsh_jq_available; <span class="hljs-keyword">then</span> drsh_jq_dependency; <span class="hljs-built_in">exit</span> 1; <span class="hljs-keyword">fi</span>
+    <span class="hljs-keyword">if</span> ! drsh_spark_available; <span class="hljs-keyword">then</span> drsh_spark_dependency; <span class="hljs-built_in">exit</span> 1; <span class="hljs-keyword">fi</span>
 
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> ! drsh_jq_available; <span class="keyword">then</span> drsh_jq_dependency; exit <span class="number">1</span>; fi
-    <span class="keyword">if</span> ! drsh_spark_available; <span class="keyword">then</span> drsh_spark_dependency; exit <span class="number">1</span>; fi
-
-    drsh <span class="variable">${</span>@<span class="symbol">:-`cat`</span>}
-fi</pre></div></div>
-
+    drsh <span class="hljs-variable">${@:-`cat`}</span>
+<span class="hljs-keyword">fi</span></pre></div></div>
+            
         </li>
-
+        
     </ul>
   </div>
 </body>
